@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>void iOS mods</title>
+    <style>
+        :root {
+            --bg: #050508; --surface: #0e0e14; --surface2: #16161f; --surface3: #1c1c28;
+            --border: #1e1e2a; --border-hover: #2a2a3a; --text: #c8c8d4; --text-muted: #7a7a8c;
+            --text-bright: #e8e8f0; --accent: #7c5ce7; --accent-glow: rgba(124,92,231,0.25);
+            --accent-subtle: rgba(124,92,231,0.08); --danger: #e74c5e; --danger-glow: rgba(231,76,94,0.2);
+            --success: #3dd68c; --radius-sm: 10px; --radius: 14px; --radius-lg: 20px;
+            --font: -apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',system-ui,sans-serif;
+            --shadow-card: 0 1px 0 var(--border), 0 4px 24px rgba(0,0,0,0.5);
+            --shadow-glow: 0 0 60px var(--accent-glow); --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family:var(--font); background:var(--bg); color:var(--text); min-height:100vh;
+            line-height:1.5; -webkit-font-smoothing:antialiased;
+            background-image:radial-gradient(ellipse at 50% 0%, rgba(124,92,231,0.04) 0%, transparent 70%),
+            radial-gradient(ellipse at 80% 100%, rgba(124,92,231,0.03) 0%, transparent 60%);
+        }
+        .logo-section { text-align:center; padding:40px 20px 0; }
+        .logo-dot { width:72px; height:72px; border-radius:50%; background:var(--accent); box-shadow:0 0 30px var(--accent-glow),0 0 70px var(--accent-glow); animation:pulse-logo 3s infinite; margin:0 auto 16px; display:block; }
+        @keyframes pulse-logo { 0%,100%{box-shadow:0 0 30px var(--accent-glow),0 0 70px var(--accent-glow);} 50%{box-shadow:0 0 40px var(--accent-glow),0 0 90px var(--accent-glow);} }
+        .header-text { text-align:center; padding:0 24px 8px; }
+        .header-text h1 { font-size:1.8rem; font-weight:700; color:var(--text-bright); }
+        .header-tagline { font-size:0.9rem; color:var(--text-muted); margin-top:4px; }
+        .main { max-width:780px; margin:0 auto; padding:28px 20px 60px; }
+        .search-wrap { position:relative; margin-bottom:24px; }
+        .search-input { width:100%; padding:12px 16px 12px 44px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); color:var(--text-bright); font-size:0.95rem; outline:none; }
+        .search-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-subtle); background:var(--surface2); }
+        .search-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--text-muted); }
+        .search-icon svg { display:block; width:18px; height:18px; }
+        .file-count { font-size:0.8rem; color:var(--text-muted); margin-bottom:16px; text-transform:uppercase; }
+        .file-grid { display:grid; grid-template-columns:1fr; gap:10px; }
+        @media(min-width:600px) { .file-grid{grid-template-columns:1fr 1fr;} }
+        .file-card { display:flex; align-items:center; gap:14px; padding:16px 18px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); text-decoration:none; color:inherit; transition:var(--transition); box-shadow:var(--shadow-card); }
+        .file-card:hover { border-color:var(--border-hover); background:var(--surface2); }
+        .file-icon-wrap { width:44px; height:44px; border-radius:var(--radius-sm); background:var(--surface3); display:flex; align-items:center; justify-content:center; border:1px solid var(--border); }
+        .file-icon-wrap svg { width:22px; height:22px; color:var(--accent); }
+        .file-info { flex:1; min-width:0; }
+        .file-name { font-weight:600; font-size:0.95rem; color:var(--text-bright); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .file-meta { font-size:0.78rem; color:var(--text-muted); display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+        .download-btn { flex-shrink:0; width:38px; height:38px; border-radius:50%; border:1px solid var(--border); background:var(--surface3); color:var(--text-bright); display:flex; align-items:center; justify-content:center; transition:var(--transition); text-decoration:none; }
+        .download-btn:hover { background:var(--accent); border-color:var(--accent); color:#fff; box-shadow:0 0 20px var(--accent-glow); }
+        .download-btn svg { width:18px; height:18px; }
+        .empty-state { text-align:center; padding:60px 20px; color:var(--text-muted); grid-column:1/-1; }
+        .footer { text-align:center; padding:20px; font-size:0.78rem; color:var(--text-muted); border-top:1px solid var(--border); margin-top:20px; }
+        .secret-trigger { color:var(--text-muted); user-select:none; font-size:1.2rem; }
+        .admin-overlay { position:fixed; inset:0; background:rgba(5,5,8,0.92); backdrop-filter:blur(12px); z-index:100; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+        .admin-overlay.active { opacity:1; pointer-events:auto; }
+        .admin-panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:28px 24px; width:90%; max-width:560px; max-height:85vh; overflow-y:auto; position:relative; }
+        .admin-panel h2 { font-size:1.3rem; font-weight:700; color:var(--text-bright); margin-bottom:6px; }
+        .admin-subtitle { font-size:0.82rem; color:var(--text-muted); margin-bottom:20px; }
+        .admin-close { position:absolute; top:16px; right:16px; width:34px; height:34px; border-radius:50%; border:1px solid var(--border); background:var(--surface2); color:var(--text); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+        .admin-close:hover { background:var(--danger); border-color:var(--danger); color:#fff; }
+        .admin-section { margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid var(--border); }
+        .admin-section:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }
+        .admin-section h3 { font-size:0.78rem; font-weight:600; color:var(--text-muted); margin-bottom:10px; text-transform:uppercase; }
+        .admin-form-row { display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
+        .admin-input { flex:1; min-width:140px; padding:10px 14px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text-bright); font-size:0.9rem; outline:none; }
+        .admin-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-subtle); }
+        .admin-btn { padding:10px 20px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--surface3); color:var(--text-bright); cursor:pointer; font-weight:600; transition:var(--transition); }
+        .admin-btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+        .admin-btn.primary:hover { box-shadow:0 0 24px var(--accent-glow); background:#8b6bf0; }
+        .admin-btn.danger { background:transparent; border-color:var(--danger); color:var(--danger); font-size:0.8rem; padding:6px 12px; }
+        .admin-btn.danger:hover { background:var(--danger); color:#fff; }
+        .admin-msg { font-size:0.82rem; padding:8px 12px; border-radius:var(--radius-sm); margin-top:8px; display:none; }
+        .admin-msg.show { display:block; }
+        .admin-msg.success { background:rgba(61,214,140,0.1); color:var(--success); border:1px solid rgba(61,214,140,0.3); }
+        .admin-msg.error { background:rgba(231,76,94,0.1); color:var(--danger); border:1px solid rgba(231,76,94,0.3); }
+        .status-box { margin-top:10px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px; font-family:monospace; font-size:0.75rem; color:var(--text-muted); max-height:120px; overflow-y:auto; white-space:pre-wrap; display:none; }
+        .status-box.visible { display:block; }
+        .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(100px); background:var(--surface3); border:1px solid var(--border); padding:12px 22px; border-radius:30px; font-size:0.85rem; z-index:200; transition:transform 0.35s; }
+        .toast.show { transform:translateX(-50%) translateY(0); }
+        .file-upload-btn {
+            display: inline-block; width: 100%; padding: 28px 20px;
+            border: 2px dashed var(--border); border-radius: var(--radius);
+            background: var(--surface2); color: var(--text-muted);
+            font-family: var(--font); font-size: 0.85rem; cursor: pointer;
+            text-align: center; transition: var(--transition); position: relative;
+        }
+        .file-upload-btn:hover { border-color: var(--accent); background: var(--accent-subtle); }
+        .file-upload-btn input[type="file"] {
+            position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;
+        }
+        .file-upload-btn strong { color: var(--accent); }
+    </style>
+</head>
+<body>
+    <div class="logo-section">
+        <div class="logo-dot" id="logoDot"></div>
+        <img id="siteLogo" style="display:none; width:72px; height:72px; border-radius:18px; object-fit:contain; margin:0 auto 16px;" alt="logo" />
+    </div>
+    <div class="header-text">
+        <h1 id="siteTitle">void iOS mods</h1>
+        <p class="header-tagline" id="siteTagline">welcome to void ios mods. void mods.</p>
+    </div>
+
+    <main class="main">
+        <div class="search-wrap">
+            <span class="search-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search files...">
+        </div>
+        <div class="file-count" id="fileCount">0 files available</div>
+        <div class="file-grid" id="fileGrid">
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                </div>
+                <p>No files yet. Check back soon.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <span id="footerText">void iOS mods</span>
+        <span class="secret-trigger" id="secretTrigger">·</span>
+    </footer>
+
+    <div class="admin-overlay" id="adminOverlay">
+        <div class="admin-panel">
+            <button class="admin-close" id="adminClose">&times;</button>
+            <h2>Admin Panel</h2>
+            <p class="admin-subtitle">Manage files globally (GitHub Pages)</p>
+            <div id="adminPwSection">
+                <div style="text-align:center; padding:20px 0;">
+                    <input type="password" id="adminPwInput" placeholder="Enter admin password" style="width:100%; padding:12px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text-bright); text-align:center; margin-bottom:10px;">
+                    <button class="admin-btn primary" id="adminPwSubmit" style="width:100%;">Unlock</button>
+                </div>
+            </div>
+            <div id="adminContent" style="display:none;">
+                <div class="admin-section">
+                    <h3>Upload New File</h3>
+                    <label class="file-upload-btn" id="fileUploadLabel">
+                        <strong>Tap to select file</strong>
+                        <input type="file" id="fileInput" accept="*/*">
+                    </label>
+                    <div class="admin-form-row" style="margin-top:10px;">
+                        <input type="text" class="admin-input" id="fileNameInput" placeholder="Display name (optional)">
+                        <input type="text" class="admin-input" id="fileDescInput" placeholder="Description (optional)">
+                    </div>
+                    <div class="admin-form-row" style="margin-top:6px;">
+                        <button class="admin-btn primary" id="uploadBtn">Upload to GitHub</button>
+                        <span style="font-size:0.75rem;color:var(--text-muted);align-self:center;" id="selectedFileName">No file selected</span>
+                    </div>
+                    <div class="status-box" id="statusBox"></div>
+                    <div class="admin-msg" id="adminMsg"></div>
+                </div>
+                <div class="admin-section">
+                    <h3>Uploaded Files</h3>
+                    <ul id="adminFileList" style="list-style:none; display:flex; flex-direction:column; gap:8px;">
+                        <li style="color:var(--text-muted);font-size:0.82rem;padding:8px;">No files uploaded yet.</li>
+                    </ul>
+                </div>
+                <div style="text-align:right;">
+                    <button class="admin-btn danger" id="adminLogout" style="font-size:0.8rem; padding:6px 12px;">Lock Panel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ========== CONFIG – Replace with your new token ==========
+        const CONFIG = {
+            SITE_NAME: 'void iOS mods',
+            SITE_TAGLINE: 'welcome to void ios mods. void mods.',
+            FOOTER_TEXT: 'void iOS mods',
+            ADMIN_PASSWORD: 'void2024',
+            ACCENT_COLOR: '#7c5ce7',
+            ICON_URL: '',
+            MAX_UPLOAD_SIZE_MB: 2048,
+            GITHUB_OWNER: 'dominators-mea',
+            GITHUB_REPO: 'void-mods-storage',
+            GITHUB_TOKEN: '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',   // ← paste your new token here
+            GITHUB_RELEASE_TAG: 'mods',
+            GITHUB_METADATA_FILE: 'files.json',
+            PRELOADED_FILES: []
+        };
+
+        // Branding
+        document.getElementById('siteTitle').textContent = CONFIG.SITE_NAME;
+        document.getElementById('siteTagline').textContent = CONFIG.SITE_TAGLINE;
+        document.getElementById('footerText').textContent = CONFIG.FOOTER_TEXT;
+        document.title = CONFIG.SITE_NAME;
+        document.documentElement.style.setProperty('--accent', CONFIG.ACCENT_COLOR);
+        if (CONFIG.ICON_URL) {
+            const img = document.getElementById('siteLogo');
+            img.src = CONFIG.ICON_URL;
+            img.style.display = 'block';
+            document.getElementById('logoDot').style.display = 'none';
+        }
+
+        // ========== GitHub helpers ==========
+        const GITHUB_API = `https://api.github.com/repos/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}`;
+        const RAW_URL = `https://raw.githubusercontent.com/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}/main/${CONFIG.GITHUB_METADATA_FILE}`;
+        const METADATA_API_URL = `${GITHUB_API}/contents/${CONFIG.GITHUB_METADATA_FILE}`;
+
+        // Status display
+        const statusBox = document.getElementById('statusBox');
+        function logStatus(msg, isError = false) {
+            statusBox.classList.add('visible');
+            statusBox.textContent += (isError ? '❌ ' : '✓ ') + msg + '\n';
+            statusBox.scrollTop = statusBox.scrollHeight;
+        }
+        function clearStatus() {
+            statusBox.textContent = '';
+            statusBox.classList.remove('visible');
+        }
+
+        async function fetchMods() {
+            try {
+                const res = await fetch(RAW_URL);
+                if (!res.ok) return [];
+                return await res.json();
+            } catch (e) { return []; }
+        }
+
+        async function updateMods(mods) {
+            const getRes = await fetch(METADATA_API_URL, {
+                headers: { Authorization: `token ${CONFIG.GITHUB_TOKEN}` }
+            });
+            const data = await getRes.json();
+            const sha = data.sha;
+            const content = btoa(unescape(encodeURIComponent(JSON.stringify(mods, null, 2))));
+            const updateRes = await fetch(METADATA_API_URL, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `token ${CONFIG.GITHUB_TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: 'Update mod list',
+                    content: content,
+                    sha: sha,
+                    branch: 'main'
+                })
+            });
+            if (!updateRes.ok) throw new Error('Update failed: ' + (await updateRes.text()));
+        }
+
+        async function getOrCreateRelease() {
+            let res = await fetch(`${GITHUB_API}/releases/tags/${CONFIG.GITHUB_RELEASE_TAG}`, {
+                headers: { Authorization: `token ${CONFIG.GITHUB_TOKEN}` }
+            });
+            if (res.ok) return await res.json();
+            // Create release
+            res = await fetch(`${GITHUB_API}/releases`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `token ${CONFIG.GITHUB_TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    tag_name: CONFIG.GITHUB_RELEASE_TAG,
+                    name: 'Mods Storage',
+                    body: 'File storage for void iOS mods',
+                    draft: false,
+                    prerelease: false
+                })
+            });
+            if (!res.ok) throw new Error('Could not create release: ' + (await res.text()));
+            return await res.json();
+        }
+
+        async function uploadFileToRelease(file, release) {
+            const uploadUrl = release.upload_url.replace('{?name,label}', '');
+            const fullUrl = `${uploadUrl}?name=${encodeURIComponent(file.name)}`;
+            const res = await fetch(fullUrl, {
+                method: 'POST',
+                headers: {
+                    Authorization: `token ${CONFIG.GITHUB_TOKEN}`,
+                    'Content-Type': 'application/octet-stream'
+                },
+                body: file
+            });
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.message || 'Upload failed');
+            }
+            const asset = await res.json();
+            return asset.browser_download_url;
+        }
+
+        // Utils
+        const formatSize = bytes => {
+            if (!bytes || bytes <= 0) return 'Unknown size';
+            const u = ['B','KB','MB','GB']; let i=0, s=bytes;
+            while(s>=1024 && i<u.length-1){ s/=1024; i++; }
+            return s.toFixed(i?1:0)+' '+u[i];
+        };
+        const escapeHTML = str => { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; };
+
+        // Public grid
+        async function renderFileGrid(query = '') {
+            const grid = document.getElementById('fileGrid');
+            const countEl = document.getElementById('fileCount');
+            let mods = [...CONFIG.PRELOADED_FILES.map(f => ({...f, source:'preload'}))];
+            try { mods = [...await fetchMods(), ...mods]; } catch(e){}
+            mods.sort((a,b) => (b.uploadDate||0) - (a.uploadDate||0));
+            const q = query.toLowerCase().trim();
+            const filtered = q ? mods.filter(m => (m.name||'').toLowerCase().includes(q) || (m.description||'').toLowerCase().includes(q)) : mods;
+            countEl.textContent = filtered.length + ' file' + (filtered.length!==1?'s':'') + ' available';
+            if (!filtered.length) {
+                grid.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div><p>${q?'No files match your search.':'No files yet. Check back soon.'}</p></div>`;
+                return;
+            }
+            grid.innerHTML = filtered.map(m => {
+                const meta = [];
+                if (m.fileSize) meta.push(formatSize(m.fileSize));
+                if (m.description) meta.push(m.description);
+                return `<div class="file-card">
+                    <div class="file-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div>
+                    <div class="file-info">
+                        <div class="file-name">${escapeHTML(m.name)}</div>
+                        <div class="file-meta">${meta.map(p => `<span>${escapeHTML(p)}</span>`).join('<span class="dot-sep"></span>')}</div>
+                    </div>
+                    <a class="download-btn" href="${m.url||'#'}" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></a>
+                </div>`;
+            }).join('');
+        }
+
+        // Admin
+        let authenticated = false;
+        let pendingFile = null;
+        const overlay = document.getElementById('adminOverlay');
+        const pwSection = document.getElementById('adminPwSection');
+        const content = document.getElementById('adminContent');
+        const pwInput = document.getElementById('adminPwInput');
+        const fileInput = document.getElementById('fileInput');
+        const fileNameInput = document.getElementById('fileNameInput');
+        const fileDescInput = document.getElementById('fileDescInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const selectedFileLabel = document.getElementById('selectedFileName');
+        const adminMsg = document.getElementById('adminMsg');
+        const adminFileList = document.getElementById('adminFileList');
+        const searchInput = document.getElementById('searchInput');
+
+        function openAdmin() { overlay.classList.add('active'); authenticated ? showContent() : showPw(); }
+        function closeAdmin() { overlay.classList.remove('active'); }
+        function showPw() { pwSection.style.display='block'; content.style.display='none'; authenticated=false; pwInput.focus(); }
+        function showContent() { pwSection.style.display='none'; content.style.display='block'; authenticated=true; refreshAdminList(); }
+        function msg(text, type) { adminMsg.textContent=text; adminMsg.className='admin-msg show '+type; setTimeout(()=>{ adminMsg.className='admin-msg'; },4000); }
+
+        async function refreshAdminList() {
+            const mods = await fetchMods();
+            adminFileList.innerHTML = mods.length ? mods.map((m, idx) => `
+                <li style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--surface2); border-radius:var(--radius-sm); border:1px solid var(--border); font-size:0.85rem; flex-wrap:wrap;">
+                    <span style="flex:1; font-weight:500;">${escapeHTML(m.name)}</span>
+                    <span style="font-size:0.7rem; color:var(--text-muted);">${m.fileSize ? formatSize(m.fileSize) : ''}</span>
+                    <button class="admin-btn danger" data-idx="${idx}" style="font-size:0.7rem; padding:4px 8px;">Delete</button>
+                </li>`) : '<li style="color:var(--text-muted);">No files yet.</li>';
+
+            document.querySelectorAll('.admin-btn.danger').forEach(btn => {
+                btn.onclick = async () => {
+                    if (!confirm('Delete this entry?')) return;
+                    const mods = await fetchMods();
+                    mods.splice(btn.dataset.idx, 1);
+                    try {
+                        await updateMods(mods);
+                        refreshAdminList();
+                        renderFileGrid(searchInput.value);
+                        msg('Deleted.', 'success');
+                    } catch (e) { msg('Error: '+e.message, 'error'); }
+                };
+            });
+        }
+
+        document.getElementById('adminPwSubmit').onclick = () => {
+            if (pwInput.value === CONFIG.ADMIN_PASSWORD) showContent();
+            else { msg('Wrong password', 'error'); pwInput.value = ''; }
+        };
+        document.getElementById('adminClose').onclick = closeAdmin;
+        overlay.onclick = e => { if (e.target===overlay) closeAdmin(); };
+        document.getElementById('adminLogout').onclick = () => { showPw(); };
+
+        // File selection
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                pendingFile = file;
+                selectedFileLabel.textContent = file.name + ' (' + formatSize(file.size) + ')';
+                document.getElementById('fileUploadLabel').querySelector('strong').textContent = 'Selected: ' + file.name;
+                if (!fileNameInput.value.trim()) {
+                    fileNameInput.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            }
+        });
+
+        // Upload with status feedback
+        uploadBtn.addEventListener('click', async () => {
+            clearStatus();
+            if (!pendingFile) {
+                logStatus('No file selected. Please tap "Tap to select file" first.', true);
+                msg('Select a file', 'error');
+                return;
+            }
+            const name = fileNameInput.value.trim() || pendingFile.name.replace(/\.[^/.]+$/, '');
+            const desc = fileDescInput.value.trim();
+            const maxSize = (CONFIG.MAX_UPLOAD_SIZE_MB || 2048) * 1024 * 1024;
+            if (pendingFile.size > maxSize) {
+                logStatus('File too large (max ' + CONFIG.MAX_UPLOAD_SIZE_MB + ' MB)', true);
+                msg('File too large', 'error');
+                return;
+            }
+
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Uploading...';
+            logStatus('Starting upload for: ' + name);
+
+            try {
+                // 1. Get or create release
+                logStatus('Fetching/creating release...');
+                const release = await getOrCreateRelease();
+                logStatus('Release ready: ' + release.tag_name);
+
+                // 2. Upload file
+                logStatus('Uploading file to GitHub release...');
+                const downloadUrl = await uploadFileToRelease(pendingFile, release);
+                logStatus('File uploaded! URL: ' + downloadUrl);
+
+                // 3. Update metadata
+                logStatus('Updating files.json...');
+                const mods = await fetchMods();
+                mods.push({
+                    name, description: desc,
+                    url: downloadUrl,
+                    fileSize: pendingFile.size,
+                    fileName: pendingFile.name,
+                    uploadDate: Date.now()
+                });
+                await updateMods(mods);
+                logStatus('files.json updated successfully!');
+
+                // Reset UI
+                pendingFile = null;
+                fileInput.value = '';
+                fileNameInput.value = '';
+                fileDescInput.value = '';
+                selectedFileLabel.textContent = 'No file selected';
+                document.getElementById('fileUploadLabel').querySelector('strong').textContent = 'Tap to select file';
+                refreshAdminList();
+                renderFileGrid(searchInput.value);
+                msg('Uploaded!', 'success');
+                logStatus('All done!');
+            } catch (e) {
+                logStatus('ERROR: ' + e.message, true);
+                msg('Upload failed: ' + e.message, 'error');
+            }
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = 'Upload to GitHub';
+        });
+
+        // Secret trigger
+        const secret = document.querySelector('.secret-trigger');
+        let tapCount = 0, tapTimer;
+        secret.addEventListener('click', () => {
+            tapCount++;
+            if (tapCount >= 5) {
+                openAdmin();
+                tapCount = 0;
+                clearTimeout(tapTimer);
+            } else {
+                clearTimeout(tapTimer);
+                tapTimer = setTimeout(() => tapCount = 0, 1500);
+            }
+        });
+
+        // Search
+        searchInput.addEventListener('input', () => renderFileGrid(searchInput.value));
+
+        // Toast
+        window.showToast = msg => {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2200);
+        };
+
+        // Init
+        renderFileGrid();
+        if (sessionStorage.getItem('void_admin_authenticated') === 'true') authenticated = true;
+    </script>
+</body>
+</html>
